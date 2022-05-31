@@ -10,7 +10,7 @@ class PathFinder:
         self.good_way = -2
         self.no_way = 222222
 
-    def findPath(self, start, end, board, empty, obstacle):
+    def findPath(self, start, end, board,obstacle):
         start_x, start_y = start
         end_x, end_y = end
         temp_arr = copy.deepcopy(board)

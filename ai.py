@@ -17,7 +17,7 @@ class AI:
         if len(self.path) == 0:
             self.path = self.path_finder.findPath(start=self.game.head_pos, end=self.game.food_pos,
                                                   board=self.game.board,
-                                                  empty=[0], obstacle=[1, 2])
+                                                  obstacle=[1, 2])
         if len(self.path) == 0:
             move = (1, 0)
         # move = (self.path[-1][0] - self.game.head_pos[0], self.path[-1][1] - self.game.head_pos[1])
