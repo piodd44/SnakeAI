@@ -41,6 +41,7 @@ class Painter:
         rect = pygame.Rect(pos_x, pos_y, size, size)
         pygame.draw.rect(self.screen, color=path, rect=rect)
 
+
 def test():
     painter = Painter()
     while True:

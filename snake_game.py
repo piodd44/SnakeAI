@@ -1,7 +1,6 @@
 import random
 import pygame
 from painter import Painter
-from ai import AI
 import time
 
 
@@ -21,17 +20,17 @@ class SnakeGame:
         self.direction = (1, 0)
         self.score = 0
         self.dead = False
+        self.reward = 0
 
     def reset(self):
         self.food_pos = [0, 0]
-        self.painter = Painter(self.size_x * (self.box_size + self.line_size),
-                               self.size_y * (self.box_size + self.line_size))
         self.board = []
         self.list_snake_body = []
         self.create_board()
         self.direction = (1, 0)
         self.score = 0
         self.dead = False
+        return [self.board]
 
     def create_board(self):
         self.board = [[0 for y in range(self.size_y)] for x in range(self.size_x)]
@@ -127,11 +126,12 @@ class SnakeGame:
     def is_death(self):
         if self.board[self.head_pos[0]][self.head_pos[1]] == 1:
             self.dead = True
+            self.score -= 2
 
     def eat(self):
         if self.head_pos == self.food_pos:
             self.score += 1
-            print("zjedzone", "pkt=", self.score)
+            # print("zjedzone", "pkt=", self.score)
             self.list_snake_body.append(self.food_pos.copy())
             self.create_food()
 
@@ -145,16 +145,71 @@ class SnakeGame:
             self.create_food()
 
     def make_step(self, ai_move):
+        start_distance = self.distance_to_food()
+        last_score = self.score
         last_direction = self.direction
-        ai_move = ai_move
+        # print(ai_move)
+        if ai_move == 0:
+            ai_move = (1, 0)
+        elif ai_move == 1:
+            ai_move = (-1, 0)
+        elif ai_move == 2:
+            ai_move = (0, 1)
+        elif ai_move == 3:
+            ai_move = (0, -1)
         if last_direction[0] != -ai_move[0] and last_direction[1] != -ai_move[1]:
             self.direction = ai_move
         self.make_move()
         self.is_death()
+        end_distance = self.distance_to_food()
         self.eat()
+        reward_distance = start_distance - end_distance
+        reward = self.score - last_score
+        reward += reward_distance * 0.125
+
+        return [self.board], reward, self.dead
 
     def get_board(self):
         return self.board
 
     def possible_move(self):
         return [[0, 1], [1, 0], [-1, 0], [0, -1]]
+
+    def distance_to_food(self):
+        return abs(self.food_pos[0] - self.head_pos[0]) + abs(
+            self.food_pos[1] - self.head_pos[1])
+
+    def get_simple_state(self):
+        state = []
+        # food position state
+        if self.food_pos[0] < self.head_pos[0]:
+            state.append(-1)
+        elif self.food_pos[0] > self.head_pos[0]:
+            state.append(1)
+        else:
+            state.append(0)
+        if self.food_pos[1] < self.head_pos[1]:
+            state.append(-1)
+        elif self.food_pos[1] > self.head_pos[1]:
+            state.append(1)
+        else:
+            state.append(0)
+        direction_list = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+        for direction in direction_list:
+            if self.is_empty(direction):
+                state.append(1)
+            else:
+                state.append(-1)
+        for i, direction in enumerate(direction_list):
+            if direction == self.direction:
+                state.append(i)
+        state = tuple(state)
+        return state
+
+    def is_empty(self, direction):
+        head_x, head_y = self.head_pos
+        next_x = (head_x + direction[0]) % self.size_x
+        next_y = (head_y + direction[1]) % self.size_y
+        if self.board[next_x][next_y] == 1:
+            return False
+        return True
