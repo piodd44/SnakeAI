@@ -92,7 +92,7 @@ class State:
         return move
 
     def update_statistics(self):
-        the_best = -1000
+        the_best = -100000000
         for move in self.action_dictionary:
             all_moves = self.action_dictionary[move][0]
             all_reward = self.action_dictionary[move][1]

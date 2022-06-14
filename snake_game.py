@@ -165,7 +165,10 @@ class SnakeGame:
         self.eat()
         reward_distance = start_distance - end_distance
         reward = self.score - last_score
-        reward += reward_distance * 0.125
+        if reward_distance>0:
+            reward += reward_distance * 0.125
+        else:
+            reward += reward_distance * 0.25
 
         return [self.board], reward, self.dead
 

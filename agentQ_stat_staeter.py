@@ -6,7 +6,7 @@ import numpy as np
 snake_game = SnakeGame(10, 10)
 agent = AgentQStat(4)
 random_learning_game = 10 * 1000
-epsilon_learning_game = 4 * 1000
+epsilon_learning_game = 40 * 1000
 for x in range(random_learning_game):
     print(x)
     obs = snake_game.reset()
@@ -40,14 +40,13 @@ if True:
             obs = next_obs
             agent.last_state_reward(reward)
             agent.last_state_reset()
-            if x > 1500:
-                snake_game.draw_board()
+            #if x > 15000:
+                #snake_game.draw_board()
 
         score_list.append(score)
-        if x % 100 == 0:
-            print("w pętli")
-            print(np.mean(score_list[-100:]))
-            # agent.update_the_best_move()
+        if x % 1000 == 0:
+            print(np.mean(score_list[-1000:]))
+            agent.update_the_best_move()
 
 for x in range(100000):
     print(x)
@@ -63,5 +62,6 @@ for x in range(100000):
         next_obs = snake_game.get_simple_state()
         sum_of_reward += reward
         obs = next_obs
+    print(snake_game.score)
     # agent.update_reward(sum_of_reward)
     agent.reset()
